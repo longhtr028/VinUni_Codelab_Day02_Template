@@ -1,8 +1,8 @@
 # 01 — Problem Scan & Quick Cards (Lab 02: AI Product Scoping)
 
-- **Tên nhóm:** [ĐIỀN TÊN NHÓM]
+- **Tên nhóm:** [Nhóm Vin]
 - **Thành viên:**
-  1. Phạm Nguyên Khoa — [ĐIỀN EMAIL] *(tác giả file này, branch `PhamNguyenKhoa`)*
+  1. Phạm Nguyên Khoa (MSSV: 03795) — [pnkvlog1508@gmail.com] *(tác giả file này)*
   2. [Họ tên thành viên 2] — [email]
   3. [Họ tên thành viên 3] — [email]
   4. [Họ tên thành viên 4] — [email]
