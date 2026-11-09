@@ -1,100 +1,99 @@
-# Phase 3 & 5 Deliverable: AI Product Deep-Dive Report
-**Project:** Xanh SM Intelligent Dispatcher Co-Pilot (Emergency EV Charging Triage)  
-**Business Unit:** GSM (Xanh SM) / Vin Smart Future — Vingroup  
-**Document Version:** 1.0 (Production Scoping)  
+# Báo Cáo Sản Phẩm Phase 3 & 5: Phân Tích Sâu Dự Án AI (Deep-Dive Report)
+**Dự án:** Trợ lý AI Đồng hành Điều phối Thông minh Xanh SM (Xử lý sự cố pin EV thực địa)  
+**Đơn vị:** Khối Vận Hành Xanh SM (GSM) / Vin Smart Future — Tập đoàn Vingroup  
+**Phiên bản tài liệu:** 1.0 (Quy chuẩn Scoping Sản phẩm)  
 
 ---
 
-## 🏗️ 1. Current-State Workflow Mapping
+## 🏗️ 1. Sơ Đồ Quy Trình Hiện Tại (Current-State Workflow Mapping)
 
-The current operational procedure when an active electric taxi driver experiences battery distress:
+Quy trình xử lý thủ công hiện tại khi tài xế taxi điện Xanh SM gặp sự cố pin khẩn cấp:
 
 ```text
 ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│ Step 1          │       │ Step 2          │       │ Step 3 (🔴)      │       │ Step 4 (🔴)      │
-│ Inbound Distress│ ────> │ Telemetry Query │ ────> │ Station Slot    │ ────> │ Dispatch Draft  │
-│ Call Receipt    │       │ & GPS Lookup    │       │ Search & Match  │       │ & SMS Guidance  │
+│ Bước 1          │       │ Bước 2          │       │ Bước 3 (🔴)      │       │ Bước 4 (🔴)      │
+│ Tiếp nhận cuộc  │ ────> │ Tra cứu định vị │ ────> │ Tìm & khớp trạm │ ────> │ Soạn văn bản    │
+│ gọi sự cố       │       │ GPS & mức pin   │       │ sạc còn trụ     │       │ hướng dẫn gửi TX│
 │                 │       │                 │       │                 │       │                 │
-│ Actor: Dispatcher       │ Actor: Dispatcher       │ Actor: Dispatcher       │ Actor: Dispatcher│
-│ Duration: 2 min │       │ Duration: 2 min │       │ Duration: 5 min │       │ Duration: 5 min │
-│ Input: Voice    │       │ Input: Plate ID │       │ Input: GPS, Type│       │ Input: Raw data │
-│ Output: Ticket  │       │ Output: Lat/Long│       │ Output: Station │       │ Output: SMS text│
+│ Ai: Điều phối   │       │ Ai: Điều phối   │       │ Ai: Điều phối   │       │ Ai: Điều phối   │
+│ ⏱ 2 phút        │       │ ⏱ 2 phút        │       │ ⏱ 5 phút        │       │ ⏱ 5 phút        │
+│ In: Cuộc gọi    │       │ In: Biển số xe  │       │ In: GPS, Chuẩn  │       │ In: Dữ liệu thô │
+│ Out: Phiếu lỗi  │       │ Out: Toạ độ xe  │       │ Out: Trạm sạc   │       │ Out: SMS gửi TX │
 └─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘
                                                                                       │
                                                                                       ▼
                                                                             ┌─────────────────┐
-                                                                            │ Step 5 (🔄)      │
-                                                                            │ Mobile Charger  │
-                                                                            │ Rescue Dispatch │
+                                                                            │ Bước 5 (🔄)      │
+                                                                            │ Điều phối xe cứu│
+                                                                            │ hộ sạc di động  │
                                                                             │                 │
-                                                                            │ Actor: Rescue Op│
-                                                                            │ Duration: 1 min │
-                                                                            │ Trigger: Batt<5%│
+                                                                            │ Ai: Đội cứu hộ  │
+                                                                            │ ⏱ 1 phút        │
+                                                                            │ ĐK: Pin < 5%    │
                                                                             └─────────────────┘
 
-Total Manual Cycle Time: ~15 minutes per critical event
-🔴 = Critical Bottlenecks (manual lookup across siloed dashboards and drafting Vietnamese directions)
-🔄 = Handoff point between Central Dispatch and Mobile Rescue Fleet
+⏱ Tổng thời gian xử lý thủ công: ~15 phút / lượt sự cố.
+🔴 = Điểm nghẽn cổ chai (Tra cứu phân tán giữa các Dashboard và soạn tin thủ công).
+🔄 = Điểm chuyển giao (Bàn giao ca trực tiếp giữa Điều phối trung tâm và Đội xe cứu hộ thực địa).
 ```
 
 ---
 
-## 📋 2. Problem Statement (6-Field Standard)
+## 📋 2. Báo Cáo Vấn Đề (Problem Statement Chuẩn 6 Trường)
 
-| Field | Detailed Operational Specification |
+| Trường thông tin | Quy cách vận hành chi tiết |
 |---|---|
-| **1. Actor / Operator** | Operations Dispatcher at Xanh SM Central Dispatch Center (Hanoi & Ho Chi Minh City). |
-| **2. Current Workflow** | Drivers call hotline when battery drops below 10%. Dispatcher opens internal fleet tracker, matches driver GPS with VinFast charging network dashboard to locate available compatible plugs (CCS2/GBT), manually calculates driving distance, types an SMS with directions and battery conservation advice, and escalates to mobile rescue vehicles if battery is under 5%. |
-| **3. Bottleneck** | **Steps 3 & 4 (taking 10 of the 15 minutes):** Dispatchers must manually cross-reference vehicle battery level, connector compatibility (VF5, VF8, VF9), and station real-time occupancy, followed by typing localized driving instructions. |
-| **4. Business Impact** | Across ~80 daily battery-critical incidents in metropolitan areas, ~20 dispatcher hours are lost daily. High wait times result in a 15% vehicle idle-time revenue leak, increased towing costs (approx. 500,000 VND per dead vehicle), and severe customer trip cancellation spillover. |
-| **5. Success Metric** | **1. Speed:** Reduce average incident resolution time from 15 min to **< 3 minutes**.<br>**2. Precision:** Achieve **99% compatibility match** (correct charging standard and distance feasibility).<br>**3. Safety:** **Zero dead-on-road incidents** caused by AI routing recommendations exceeding current battery range. |
-| **6. Operational Boundary** | **AI Permissions:** Access vehicle telemetry, read-only query of VinFast charging station API, and generate proposed draft routing advice.<br>**Strict Constraints (PROHIBITED):**<br>- AI is **NEVER** permitted to transmit instructions directly to drivers without human dispatcher review (mandatory `[DRAFT_ONLY]` tag enforcement).<br>- If battery is **< 5%**, AI is strictly prohibited from routing to any station farther than 5km; it must instead immediately output a structured mobile charging dispatch payload: `{"action": "dispatch_mobile_charger", "reason": "..."}`. |
+| **1. Actor / Operator** | Điều phối viên (Dispatcher) thuộc Trung tâm Điều vận Xanh SM (Hà Nội & TP.HCM). |
+| **2. Current Workflow** | Khi tài xế báo cạn pin dưới 10%, điều phối viên mở bản đồ GPS nội bộ, mở tiếp Dashboard mạng lưới trạm sạc VinFast tìm trụ sạc tương thích còn trống (CCS2/GBT), tự tính cự ly, gõ tin nhắn hướng dẫn đường đi và mẹo tiết kiệm điện gửi qua App tài xế, và gọi xe cứu hộ nếu pin dưới 5%. Quy trình 5 bước thủ công, mất 15 phút. |
+| **3. Bottleneck** | **Bước 3 & 4 (chiếm 10/15 phút):** Phải đối chiếu thủ công thông số cổng sạc xe (VF5, VF8, VF9), trạng thái thực tế của trụ sạc, và tự gõ văn bản tiếng Việt chi tiết dẫn đường. |
+| **4. Business Impact** | Mỗi ngày có ~80 sự cố pin tại Hà Nội/TP.HCM, gây thất thoát ~20 giờ làm việc của nhân viên điều vận. Xe nằm chờ gây lãng phí ~15% doanh thu cuốc xe, tốn chi phí kéo xe cứu hộ (~500.000 VNĐ/lần chết máy) và tăng tỉ lệ khách hủy chuyến do thiếu xe. |
+| **5. Success Metric** | **1. Tốc độ:** Giảm thời gian xử lý sự cố từ 15 phút xuống **dưới 3 phút**.<br>**2. Độ chính xác:** Tỉ lệ chỉ đúng trạm có trụ tương thích đạt **trên 98%**.<br>**3. An toàn:** **0 trường hợp xe cạn pin chết máy** giữa đường do AI gợi ý trạm sạc vượt quá tầm di chuyển an toàn của pin. |
+| **6. Operational Boundary** | **AI ĐƯỢC PHÉP:** Đọc telemetry xe (GPS, % pin), truy vấn API kiểm tra trạm sạc VinFast còn trống, và soạn sẵn tin nhắn hướng dẫn dạng nháp (Draft).<br>**RANH GIỚI CẤM (TUYỆT ĐỐI):**<br>- CẤM AI tự ý gửi tin nhắn trực tiếp đến tài xế khi chưa có điều phối viên bấm duyệt (bắt buộc luôn gắn thẻ `[DRAFT_ONLY]` ở đầu tin).<br>- Nếu pin **dưới 5%**, CẤM AI đề xuất bất kỳ trạm sạc nào cách xa quá 5km; AI phải lập tức xuất payload JSON gọi xe cứu hộ: `{"action": "dispatch_mobile_charger", "reason": "..."}`. |
 
 ---
 
-## ⚡ 3. AI Fit Matrix & Future-State Architecture
+## ⚡ 3. Ma Trận AI Fit & Quy Trình Tương Lai (Future-State Flow)
 
-### AI Fit Evaluation
-* **Rule-based Logic / State Machine:** Excellent for calculating distance (`haversine`) and checking plug types, but rigid and unable to interpret unstructured driver messages or compose empathetic, contextual instructions under emergency conditions.
-* **LLM Feature (Co-pilot) [SELECTED]:** Perfect fit. A single-turn LLM inference call with rigid system boundaries parses the incident context, runs safety validations, and generates a formatted draft with structured rescue action triggers.
-* **Autonomous Multi-Agent Loop:** Rejected for Phase 1. Real-time emergency vehicle routing carries physical safety and traffic liability risks; an autonomous looping agent introduces uncontrollable latency and hallucination surfaces without added value.
+### Đánh giá mức độ phù hợp AI (AI-Fit Matrix)
+* **Rule-based (Dựa trên luật):** Xử lý tốt việc tính khoảng cách toạ độ (`haversine`) và đối khớp loại cổng cắm, nhưng không thể diễn giải các tin nhắn phản hồi tự do từ tài xế cũng như không thể tạo tin nhắn hướng dẫn đường đi giàu ngữ cảnh, linh hoạt theo tình huống khẩn cấp.
+* **LLM Feature (Trợ lý đồng hành Co-pilot) [ĐƯỢC CHỌN]:** Lựa chọn tối ưu nhất. Một lệnh gọi LLM kiểm soát ranh giới nghiêm ngặt sẽ nhận dữ liệu định vị, tự động so khớp, kiểm tra ranh giới pin và tạo tin nhắn nháp kèm lệnh cứu hộ có cấu trúc cho con người duyệt chỉ với 1 click.
+* **Autonomous Multi-Agent Loop (Đa tác tử tự trị):** Bị từ chối. Lĩnh vực an toàn xe điện và điều phối giao thông thực địa có rủi ro pháp lý cao; việc dùng nhiều agent tự trị chạy lặp sẽ làm tăng độ trễ (latency) và nguy cơ ảo giác (hallucination) mà không đem lại giá trị vượt trội.
 
-### Future-State Workflow (Human-In-The-Loop)
+### Quy Trình Tương Lai Tích Hợp AI (Human-In-The-Loop)
 
 ```text
 ┌──────────────────┐       ┌────────────────────────┐       ┌────────────────────────┐       ┌──────────────────────┐
-│ Inbound Distress │       │ 🔵 Automated Ingestion  │       │ 🔵 AI Dispatch Co-Pilot │       │ 🟢 Human Dispatcher   │
-│ Trigger (Driver) │ ────> │ & Telemetry Fetch      │ ────> │ Generates Draft & Action│ ────> │ Review & One-Click   │
-│                  │       │                        │       │                        │       │ Approval             │
-│ Time: Real-time  │       │ Time: < 3 seconds      │       │ Time: < 2 seconds      │       │ Time: < 30 seconds   │
+│ Tài xế báo sự cố │       │ 🔵 Hệ thống tự động lấy│       │ 🔵 AI Co-Pilot phân tích│       │ 🟢 Điều phối viên     │
+│ khẩn cấp về pin  │ ────> │ GPS xe & dữ liệu trạm  │ ────> │ Soạn nháp & tạo lệnh   │ ────> │ Xem nhanh & 1-Click   │
+│                  │       │ sạc trống từ Cloud     │       │ cứu hộ theo ranh giới  │       │ Phê duyệt gửi tài xế │
+│ ⏱ Tức thời       │       │ ⏱ < 3 giây             │       │ ⏱ < 2 giây             │       │ ⏱ < 30 giây          │
 └──────────────────┘       └────────────────────────┘       └────────────────────────┘       └──────────────────────┘
                                                                                                         │
                                                                     ┌───────────────────────────────────┴───────────────────────────────────┐
                                                                     ▼                                                                       ▼
-                                                       [Standard Case: Battery >= 5%]                           [Critical Case: Battery < 5%]
-                                                       Approved [DRAFT_ONLY] message sent                       Structured Mobile Charger Rescue
-                                                       to driver mobile app with navigation                     Vehicle dispatched immediately
+                                                       [Trường hợp bình thường: Pin >= 5%]                     [Trường hợp khẩn cấp: Pin < 5%]
+                                                       Tin nhắn [DRAFT_ONLY] sau khi duyệt                     Lệnh JSON điều xe sạc cứu hộ di động
+                                                       sẽ tự động gửi vào App tài xế.                          được kích hoạt ngay lập tức.
                                                                     │
                                                                     ▼
-                                                       ↩️ Fallback Mode:
-                                                       If AI call times out (>5s) or returns invalid JSON,
-                                                       dispatcher dashboard falls back immediately to
-                                                       standard static map view for manual execution.
+                                                       ↩️ Cơ chế dự phòng (Fallback):
+                                                       Nếu AI gặp sự cố mạng hoặc vượt quá 5 giây,
+                                                       màn hình điều phối tự chuyển về bản đồ trạm sạc
+                                                       truyền thống để con người thao tác tay như cũ.
 ```
 
 ---
 
-## 🏁 4. Phase 5 — AI Readiness & Governance Evaluation
+## 🏁 4. Phase 5 — Đánh Giá Độ Sẵn Sàng (AI Readiness) & Quyết Định Cuối Cùng
 
-### AI Readiness Checklist
-1. **Data Availability & Quality:** **READY.** GSM fleet management platform exposes reliable vehicle telemetry APIs (GPS, state-of-charge SOC %, plug type) and real-time VinFast station occupancy feeds.
-2. **Safety & Risk Mitigation:** **READY.** Hard guardrails (`[DRAFT_ONLY]` mandatory tag requirement + programmatic assertion checks) guarantee that hallucinated outputs cannot reach drivers without dispatcher oversight.
-3. **Operational Stakeholder Alignment:** **READY.** Dispatchers currently experience high stress during peak commute hours; shifting from manual typing to 1-click review directly improves dispatcher job satisfaction and throughput.
+### Checklist Đánh giá độ sẵn sàng
+1. **Dữ liệu & Tích hợp:** **ĐẠT.** Hệ thống quản lý đội xe GSM và mạng lưới trạm sạc VinFast đã có sẵn API truy xuất thời gian thực (định vị GPS, % pin SoC, cổng sạc, trạng thái trụ trống).
+2. **Kiểm soát rủi ro & An toàn:** **ĐẠT.** Thiết lập cơ chế kiểm duyệt người trong vòng lặp (**Human-In-The-Loop**) với thẻ bắt buộc `[DRAFT_ONLY]` và kiểm tra assertion tự động bằng code Python; loại bỏ 100% rủi ro AI tự ý phát ngôn sai.
+3. **Sự sẵn sàng của nhân sự vận hành:** **ĐẠT.** Điều phối viên tại trung tâm Hà Nội/TP.HCM đang rất quá tải; việc chuyển từ gõ tay 15 phút sang duyệt 1 chạm dưới 30 giây giúp giảm áp lực công việc ngay lập tức.
 
-### Executive Recommendation: **GO (Proceed to Staged Production Pilot)**
+### Quyết định của Ban Giám Đốc Vin Smart Future: **GO (Phê Duyệt Triển Khai)**
 
-**Justification:**
-- **Technical Feasibility:** The prompt boundary prototype executed on **Gemini 2.5 / 3.5 Flash** proves that safety constraints (critical battery threshold and mandatory draft tag) can be deterministically maintained under adversarial prompting.
-- **Economic Value:** Reducing dispatch handling time by 80% (15 min ➔ <3 min) frees up 16 dispatcher hours daily, saving approximately 350M VND annually in operational overhead while reducing driver attrition and customer trip cancellations.
-- **Low Risk Profile:** Because the design strictly adheres to **Human-In-The-Loop (HITL)** architecture with explicit fallback handling, deployment poses zero risk of unvetted automated communication with drivers.
-
+**Lý giải quyết định (Dựa trên kỹ thuật và hiệu quả kinh tế):**
+- **Tính khả thi kỹ thuật:** Bản mẫu prompt nguyên mẫu chạy trên **Gemini Flash** trong file `prompt_prototype.py` đã chứng minh mô hình hoàn toàn tuân thủ ranh giới an toàn (xử lý chính xác ngưỡng pin 2% và duy trì thẻ duyệt nháp kể cả khi bị prompt tấn công).
+- **Lợi ích kinh tế:** Giảm thời gian xử lý sự cố từ 15 phút xuống < 3 phút giúp tiết kiệm 16 giờ làm việc của nhân sự mỗi ngày, giảm thiểu hư hại pin cạn kiệt, ước tính tiết kiệm cho Xanh SM hơn 350 triệu VNĐ mỗi năm chi phí vận hành và xe cứu hộ kéo đường.
+- **Rủi ro kiểm soát triệt để:** Nhờ cơ chế **HITL** và phương án dự phòng **Fallback** trực tiếp trên Dashboard, dự án không gây bất kỳ gián đoạn nào đến quy trình vận hành sẵn có của tập đoàn.
