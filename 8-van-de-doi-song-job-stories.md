@@ -1,0 +1,14 @@
+# 8 vấn đề đời sống theo 4 lăng kính
+
+> **Lưu ý:** Các con số dưới đây là ví dụ minh họa để hoàn thiện mẫu, chưa phải số liệu thực tế đã đo. Hãy thay bằng quan sát của bạn nếu dùng cho bài nộp hoặc phân tích thật.
+
+| # | Lăng kính | Job Story: Khi… tôi muốn… để… | Ai chịu ảnh hưởng? | Dấu hiệu thật (thời gian, tần suất, số người, bằng chứng) |
+|---:|---|---|---|---|
+| 1 | Lặp lại | Khi đi chợ trong tuần, tôi muốn có sẵn danh sách món cần mua, để không quên đồ thiết yếu hoặc mua trùng. | Người đi chợ và các thành viên trong gia đình. | Ví dụ minh họa: đi chợ 3 lần/tuần; quên hoặc mua trùng khoảng 2 món/tuần. Có thể kiểm tra bằng hóa đơn và danh sách mua sắm. |
+| 2 | Lặp lại | Khi hóa đơn sinh hoạt sắp đến hạn, tôi muốn biết khoản nào cần thanh toán, để tránh quên hoặc trả trễ. | Người quản lý chi tiêu trong gia đình. | Ví dụ minh họa: 5 hóa đơn/tháng; thanh toán trễ khoảng 1 lần mỗi 2 tháng. Bằng chứng có thể là lịch sử thanh toán. |
+| 3 | Lặp lại | Khi chuẩn bị ra khỏi nhà, tôi muốn kiểm tra nhanh những vật dụng cần mang theo, để không phải quay lại lấy đồ. | Người thường xuyên đi học, đi làm hoặc có lịch hẹn bên ngoài. | Ví dụ minh họa: ra khỏi nhà 10 lần/tuần; quay lại lấy đồ khoảng 2 lần/tháng. Có thể ghi lại trong nhật ký 1 tháng. |
+| 4 | Tốn thời gian | Khi chuẩn bị bữa ăn sau giờ học hoặc làm, tôi muốn chọn món phù hợp với nguyên liệu sẵn có, để bắt đầu nấu nhanh hơn. | Người nấu ăn và những người cùng ăn. | Ví dụ minh họa: nấu 5 bữa/tuần; mất khoảng 15 phút mỗi bữa để chọn món. Có thể bấm giờ trong một tuần. |
+| 5 | Tốn thời gian | Khi cần đến một nơi chưa quen, tôi muốn biết trước đường đi và thời gian di chuyển, để chủ động giờ xuất phát. | Người đi đến địa điểm mới và người đang chờ họ. | Ví dụ minh họa: đi nơi lạ 2 lần/tháng; mất khoảng 10 phút/lần để tìm đường và phương tiện. Có thể kiểm tra lịch sử tìm kiếm bản đồ. |
+| 6 | Cần đọc, tổng hợp nhiều thông tin | Khi cân nhắc mua đồ gia dụng, tôi muốn so sánh giá, tính năng và đánh giá ở một chỗ, để chọn sản phẩm phù hợp ngân sách. | Người mua và các thành viên cùng sử dụng sản phẩm. | Ví dụ minh họa: so sánh 4 sản phẩm/lần; mất khoảng 45 phút mỗi lần. Có thể ghi lại số trang đã xem và thời gian tìm hiểu. |
+| 7 | Cần đọc, tổng hợp nhiều thông tin | Khi lên kế hoạch cho chuyến đi, tôi muốn tổng hợp lịch trình, chi phí và phương tiện, để biết kế hoạch có phù hợp thời gian và ngân sách không. | Người lên kế hoạch và những người đi cùng. | Ví dụ minh họa: đối chiếu 5 nguồn thông tin; mất khoảng 3 giờ/chuyến. Có thể kiểm tra lịch sử trình duyệt, ghi chú và bảng dự toán. |
+| 8 | Pain từ người khác | Khi gia đình cần thống nhất lịch gặp mặt, tôi muốn mọi người cùng nắm lịch đã chốt, để tránh trùng lịch hoặc phải đổi kế hoạch nhiều lần. | Các thành viên trong gia đình tham gia buổi gặp. | Ví dụ minh họa: 4 người tham gia; lịch thay đổi khoảng 2 lần/tháng. Bằng chứng có thể là tin nhắn trao đổi và số lần đổi lịch. |
