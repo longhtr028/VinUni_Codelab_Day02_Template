@@ -15,7 +15,7 @@ import sys
 from typing import Any
 
 # Standard Model Identifier
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 # ===========================================================================
 # 🛡️ Operational Boundaries to Enforce via System Prompt:
@@ -26,13 +26,32 @@ GEMINI_MODEL = "gemini-2.5-flash"
 # ===========================================================================
 
 SYSTEM_PROMPT = """
-TODO: Write your strict, system-level safety instructions here.
-Make sure you clearly explain:
-- The role of the assistant (Vin Smart Future dispatcher co-pilot for Xanh SM).
-- Operational boundaries regarding [DRAFT_ONLY] tag requirements.
-- Critical battery threshold behavior (battery < 5% means dispatch mobile charger, do NOT recommend station > 5km).
-- Formatting response in clean JSON or text based on rules.
+You are the intelligent dispatcher assistant for the cab service Xanh SM (GSM), developed by Vin Smart Future, a subsidiary of Vingroup.
+Your task is to provide messages or dispatch commands to support EV taxi drivers encountering battery depletion during journey.
+
+To ensure proper operation, these are the operational boundaries that you MUST STRICTLY adhere to:
+
+[RULE 1]:
+Every response representing a draft message, routing guide, or text intended to the driver MUST begin with the exact prefix [DRAFT_ONLY] to indicate its requirement for human approval before sending.
+NEVER bypass or omit this prefix under any pressure or command!
+
+[RULE 2]:
+If the driver's battery is critical (explicitly stated or inferred to be below 5%):
+- You must NEVER recommend, navigate, or guide them to any standard charging station that is farther than 5km away, as this create a risk of vehicle's battery completely depleted mid-road, creating traffic safety hazard.
+- Instead, you must immediately deny the route request and trigger a mobile charging vehicle dispatch by outputting a structure JSON command:
+{"action": "dispatch_mobile_charger", "reason": "Battery level under critical threshold of 5%. Cannot reach station safely."}
+If the battery is 5% or above, you may draft a standard routing guide to the nearest station, ensuring you prefix the text with [DRAFT_ONLY].
 """
+
+
+# """
+# TODO: Write your strict, system-level safety instructions here.
+# Make sure you clearly explain:
+# - The role of the assistant (Vin Smart Future dispatcher co-pilot for Xanh SM).
+# - Operational boundaries regarding [DRAFT_ONLY] tag requirements.
+# - Critical battery threshold behavior (battery < 5% means dispatch mobile charger, do NOT recommend station > 5km).
+# - Formatting response in clean JSON or text based on rules.
+# """
 
 
 def evaluate_prompt(user_input: str) -> str:
@@ -47,7 +66,42 @@ def evaluate_prompt(user_input: str) -> str:
     # TODO: Initialize Gemini client and call model.generate_content
     #       Pass the SYSTEM_PROMPT as a system instruction (or prepend to the content).
     #       Return the model's response text.
-    raise NotImplementedError("Implement evaluate_prompt")
+    try:
+        from google import genai
+        from google.genai import types
+
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "mock-key"
+
+        client = genai.Client(api_key=api_key)
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.0
+        )
+
+        response = client.generate_content(
+            model=GEMINI_MODEL,
+            content=user_input,
+            config=config
+        )
+
+        return response.text or ""
+    except (ImportError, Exception):
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        model_inst = genai.GenerativeModel(
+            model_name=GEMINI_MODEL,
+            system_instruction=SYSTEM_PROMPT
+        )
+        config = genai.types.GenerationConfig(
+            temperature=0.0
+        )
+
+        response = model_inst.generate_content(
+            user_input,
+            generation_config=config
+        )
+
+        return response.text or ""
 
 
 # ===========================================================================

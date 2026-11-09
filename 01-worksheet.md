@@ -61,13 +61,13 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 > *"Tôi là AI Engineer tại Vin Smart Future (Vingroup). Tôi đang tìm kiếm các pain point vận hành cụ thể có thể tối ưu bằng AI cho mảng [Chọn một: VinFast / Xanh SM / Vinhomes / Vinmec]. Hãy gợi ý cho tôi 5 quy trình nghiệp vụ thủ công, tốn nhiều thời gian và gây rò rỉ hiệu suất kèm con số thống kê ước tính về tổn thất."*
 
 ### 📝 List bài toán của tôi:
-| # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
-|---|----------------------------------|------|---------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| # | Subsidiary (VinFast/Xanh SM...) | Lens          | Mô tả ngắn bài toán                                                                                                                                                          |
+|---|---------------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | Vinhomes                        | Lặp lại       | Phân loại tự động các khiếu nại (ví dụ: mất nước, hỏng đèn, ồn ào) gửi qua App Vinhomes Resident đến đúng ban quản lý từng tòa nhà.                                          |
+| 2 | Vinfast                         | AI-Upgrade    | Hỗ trợ tài xế khắc phục các lỗi cơ bản và kiểm tra kỹ thuật đơn giản (reset màn hình, kiểm tra áp suất lốp, etc.)                                                            |
+| 3 | Vinhomes                        | AI-Upgrade    | Điều chỉnh hệ thống điện và điều hoà trung tâm tại khu công cộng dựa trên mật độ người qua lại                                                                               |
+| 4 | Vinpearl                        | Tốn thời gian | Quét qua các đánh giá trên Booking.com, Agoda và Google Maps của Vinpearl để lọc ra các khiếu nại khẩn cấp (ví dụ: "phòng bẩn", "thái độ nhân viên kém") để gửi cho Quản lý. |
+| 5 | Vinfast                         | AI-Upgrade    | Tự động đề xuất lịch trình sạc tối ưu và trạm sạc trống phù hợp với loại cổng sạc (CCS2/GBT) của từng dòng xe điện (VF5, VF8, VF9).                                                                                                                                                                             |
 
 ---
 
@@ -77,25 +77,55 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ QUICK PROBLEM CARD #___                                     │
+│ QUICK PROBLEM CARD #1                                       │
 │                                                             │
-│ Bài toán (1 câu): ________________________________________  │
-│ Công ty thành viên: [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
+│ Bài toán (1 câu):   Phân loại khiếu nại cư dân Vinhomes.    │
+│ Công ty thành viên: [ ] VinFast  [ ] Xanh SM  [X] Vinhomes  │
 │                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
 │                                                             │
-│ Ai đang đau (Actor)? ______________________________________ │
+│ Ai đang đau (Actor)? Nhân viên điều phối                    │
 │                                                             │
 │ Workflow thủ công hiện tại (3-5 bước):                      │
-│   1. ___ ──> 2. ___ ──> 3. ___ ──> 4. ___                   │
+│   1. Cư dân phản ánh qua app
+	2. Nhân viên nhận phản ánh phân loại (mất nước, đèn hỏng, etc.)
+	3. Nhân viên forward sang BQL/Người hỗ trợ tương ứng
+	4. BQL/Người hỗ trợ đến giải quyết                        │
 │                                                             │
-│ Bước nào tốn thời gian/lỗi nhất? ___ (⏱ ___ phút/lượt)      │
-│ AI có thể nhảy vào hỗ trợ ở bước nào? _____________________ │
+│ Bước nào tốn thời gian/lỗi nhất? Bước 2-3 (⏱ 5 phút/lượt)   │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 2-3              │
 │                                                             │
-│ Đo thành công bằng gì (Metric có số)? ______________________ │
-│   VD: "Giảm thời gian soạn phản hồi từ 10 min ──> under 2 min"│
+│ Đo thành công bằng gì (Metric có số)?                       │
+│    Thời gian phản ánh đến đúng BQL/Hỗ trợ viên còn 1 phút/lượt│
 │                                                             │
-│ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
+│ Quick Architecture: [ ] No AI  [X] Rule  [ ] LLM  [ ] Agent │
 └─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ QUICK PROBLEM CARD #2                                       │
+│                                                             │
+│ Bài toán (1 câu):   Hỗ trợ kỹ thuật cho tài xế xe Vinfast   │
+│ Công ty thành viên: [X] VinFast  [ ] Xanh SM  [X] Vinhomes  │
+│                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
+│                                                             │
+│ Ai đang đau (Actor)?  Kỹ thuật viên, Tổng đài viên Vinfast  │
+│                                                             │
+│ Workflow thủ công hiện tại (3-5 bước):                      │
+│   1. Khách hàng gửi yêu cầu hỗ trợ qua tổng đài
+	2. Tổng đài viên tiếp nhận và chuyển cho kỹ thuật viên tương ứng
+	3. Kỹ thuật viên hướng dẫn khắc phục sự cố cho khách hàng
+	                                                          │
+│                                                             │
+│ Bước nào tốn thời gian/lỗi nhất? Bước 2 (⏱ 3-4 phút/lượt)   │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 2-3              │
+│                                                             │
+│ Đo thành công bằng gì (Metric có số)?                       │
+│    Thời gian hỗ trợ các vấn đề đơn giản chỉ dưới 1 phút.    │
+│                                                             │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [X] LLM  [ ] Agent │
+└─────────────────────────────────────────────────────────────┘
+
+
+
 ```
 
 > [!TIP]
